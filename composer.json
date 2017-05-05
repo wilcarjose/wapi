@@ -1,0 +1,22 @@
+{
+    "name": "wilcarjose/wapi",
+    "description": "Laravel API Tool",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wilcar José",
+            "email": "wilcarjose@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "WilcarJose\\Wapi\\": "src/",
+            "League\\Fractal\\": "vendor/league/fractal/src"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "illuminate/support": "~5.1",
+        "league/fractal": "^0.15.0"
+    }
+}
