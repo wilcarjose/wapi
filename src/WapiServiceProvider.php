@@ -17,6 +17,7 @@ class WapiServiceProvider extends ServiceProvider
     {
         include __DIR__.'/../vendor/autoload.php';
         require __DIR__ . '/Http/routes.php';
+        $this->loadTranslationsFrom(__DIR__.'/resources/lang/', 'wapi');
     }
 }
 

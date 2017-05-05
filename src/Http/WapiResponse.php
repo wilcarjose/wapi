@@ -12,7 +12,7 @@ use WilcarJose\Wapi\Transformers\DataArraySerializer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
-trait ApiResponse
+trait WapiResponse
 {
     /**
      * Status code of response
@@ -339,7 +339,7 @@ trait ApiResponse
      */
     public function sendObjectNotFound($object)
     {
-        $this->message = trans("errors.resource_not_found.$object");
+        $this->message = trans("wapi::errors.resource_not_found.$object");
 
         return $this->sendNotFoundMessage($this->message);
     }
@@ -444,6 +444,43 @@ trait ApiResponse
         $data = $dataItem ? compact('data') : $data;
 
         return response()->json($data, $this->statusCode, $headers);
+    }
+
+    /**
+     * Return json item or not found object
+     *
+     * @param  mixed  $object
+     * @param  mixed  $transformer
+     * @param  string $resource
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function item($object, $transformer, $resource)
+    {
+        return $object
+            ? $this->respondWithItem($object, $transformer)
+            : $this->sendObjectNotFound($resource);
+    }
+
+    /**
+     * Return json collection or empty data
+     *
+     * @param  array        $collection
+     * @param  mixed        $transformer
+     * @param  ParamService $params
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function collection($collection, $transformer, $params)
+    {
+        return $collection->isNotEmpty()
+            ? $this->respondWithCollection(
+                $collection,
+                $transformer,
+                $params->getInclude(),
+                $params->getFields()
+            )
+            : $this->sendEmptyData();
     }
 
     /**
