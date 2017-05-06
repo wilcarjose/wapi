@@ -7,11 +7,10 @@ use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Resource\Collection;
-//use League\Fractal\TransformerAbstract;
 use WilcarJose\Wapi\Transformers\DataArraySerializer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-
+// \Illuminate\Pagination\LengthAwarePaginator
 trait WapiResponse
 {
     /**
@@ -315,7 +314,7 @@ trait WapiResponse
     {
         $event = !empty($event) ? $event : 'not_found';
 
-        return response()->json(['status' => 404, 'message' => trans("errors.$event")], 404);
+        return response()->json(['status' => 404, 'message' => trans("wapi::errors.$event")], 404);
     }
 
     /**
@@ -337,8 +336,12 @@ trait WapiResponse
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function sendObjectNotFound($object)
+    public function sendObjectNotFound($object = '')
     {
+        if (empty($object)) {
+            return $this->sendNotFound();
+        }
+
         $this->message = trans("wapi::errors.resource_not_found.$object");
 
         return $this->sendNotFoundMessage($this->message);
@@ -390,7 +393,7 @@ trait WapiResponse
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithCollection($collection, $callback, $include = '', $fields = '')
+    protected function sendCollection($collection, $callback, $include = '', $fields = '')
     {
         $this->fractal->setSerializer(new DataArraySerializer());
 
@@ -399,14 +402,11 @@ trait WapiResponse
         $callback->filterFields($fields);
         
         $resource = new Collection($collection, $callback, 'data');
- 
-        //set empty data pagination
-        if (empty($collection)) {
-            $collection = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
-            $resource = new Collection($collection, $callback);
-        }
 
-        $resource->setPaginator(new IlluminatePaginatorAdapter($collection));
+        if ($collection instanceof LengthAwarePaginator) {
+
+            $resource->setPaginator(new IlluminatePaginatorAdapter($collection));
+        }
 
         $rootScope = $this->fractal->createData($resource);
 
@@ -421,8 +421,12 @@ trait WapiResponse
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithItem($item, $callback)
+    protected function sendItem($item, $callback, $notFoundMsg = '')
     {
+        if (is_null($item)) {
+            return $this->sendObjectNotFound($notFoundMsg);
+        }
+
         $resource = new Item($item, $callback);
 
         $rootScope = $this->fractal->createData($resource);
@@ -444,43 +448,6 @@ trait WapiResponse
         $data = $dataItem ? compact('data') : $data;
 
         return response()->json($data, $this->statusCode, $headers);
-    }
-
-    /**
-     * Return json item or not found object
-     *
-     * @param  mixed  $object
-     * @param  mixed  $transformer
-     * @param  string $resource
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function item($object, $transformer, $resource)
-    {
-        return $object
-            ? $this->respondWithItem($object, $transformer)
-            : $this->sendObjectNotFound($resource);
-    }
-
-    /**
-     * Return json collection or empty data
-     *
-     * @param  array        $collection
-     * @param  mixed        $transformer
-     * @param  ParamService $params
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function collection($collection, $transformer, $params)
-    {
-        return $collection->isNotEmpty()
-            ? $this->respondWithCollection(
-                $collection,
-                $transformer,
-                $params->getInclude(),
-                $params->getFields()
-            )
-            : $this->sendEmptyData();
     }
 
     /**
