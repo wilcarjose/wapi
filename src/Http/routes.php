@@ -1,5 +1,5 @@
 <?php
 
-Route::get('wapi/list', function(){
-    return "I'm here!";
+Route::get('wapi', function(){
+    return "I'm Wapi!";
 });

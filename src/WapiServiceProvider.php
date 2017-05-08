@@ -1,6 +1,6 @@
 <?php
 
-namespace WilcarJose\Wapi;
+namespace Wilcar\Wapi;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -20,4 +20,3 @@ class WapiServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__.'/resources/lang/', 'wapi');
     }
 }
-

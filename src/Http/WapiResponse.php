@@ -1,13 +1,13 @@
 <?php
 
-namespace WilcarJose\Wapi\Http;
+namespace Wilcar\Wapi\Http;
 
 use League\Fractal\Manager;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Resource\Collection;
-use WilcarJose\Wapi\Transformers\DataArraySerializer;
+use Wilcar\Wapi\Transformers\DataArraySerializer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 // \Illuminate\Pagination\LengthAwarePaginator

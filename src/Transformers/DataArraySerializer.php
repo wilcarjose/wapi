@@ -1,6 +1,6 @@
 <?php
 
-namespace WilcarJose\Wapi\Transformers;
+namespace Wilcar\Wapi\Transformers;
 
 use League\Fractal\Serializer\ArraySerializer as Serializer;
 
